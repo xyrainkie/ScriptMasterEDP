@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ScriptMaster AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+      /* Custom scrollbar for better aesthetics */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1; 
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8; 
+      }
+      
+      /* Content Editable placeholder */
+      [contenteditable]:empty:before {
+        content: attr(placeholder);
+        color: #94a3b8;
+        display: block; /* For Firefox */
+      }
+      .animate-fade-in {
+          animation: fadeIn 0.3s ease-in-out;
+      }
+      @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(5px); }
+          to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* PRINT STYLES FOR PDF EXPORT */
+      @media print {
+        @page { margin: 1cm; size: A4; }
+        body { background: white; -webkit-print-color-adjust: exact; }
+        
+        /* Hide UI elements */
+        .no-print, 
+        header, 
+        button, 
+        .config-sidebar, 
+        .tab-nav,
+        .quick-action-card,
+        .add-segment-btn { 
+          display: none !important; 
+        }
+
+        /* Expand Layout */
+        main { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+        .segment-card { 
+            break-inside: avoid; 
+            border: 1px solid #ddd !important;
+            box-shadow: none !important;
+            margin-bottom: 20px !important;
+        }
+        
+        /* Force Form Layout to be visible and readable */
+        .asset-row {
+             break-inside: avoid;
+             border-bottom: 1px solid #eee;
+        }
+        .asset-metadata { 
+            width: 200px !important; 
+            border-right: 1px solid #eee !important;
+            background: #f9fafb !important; 
+        }
+        .asset-content { padding: 10px !important; }
+        
+        /* Typography */
+        h1, h2, h3 { color: #000 !important; }
+        p { color: #000 !important; }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.31.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
