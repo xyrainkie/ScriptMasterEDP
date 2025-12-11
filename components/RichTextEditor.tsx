@@ -30,6 +30,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     sel?.addRange(range);
   };
 
+  const handleFocus = () => {
+    const el = editorRef.current;
+    if (!el) return;
+    const plain = (el.innerText || '').replace(/\u200B/g, '').trim();
+    if (plain.length === 0) {
+      placeCaretAtEnd();
+    }
+  };
+
   useEffect(() => {
     if (editorRef.current && editorRef.current.innerHTML !== value) {
        if (value === '' || editorRef.current.innerHTML === '<br>') {
@@ -196,7 +205,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         className={`flex-grow p-4 outline-none prose prose-sm prose-slate max-w-none text-slate-700 leading-normal overflow-y-auto ${height}`}
         contentEditable
         onInput={handleInput}
-        onFocus={placeCaretAtEnd}
+        onFocus={handleFocus}
         placeholder={placeholder}
         dangerouslySetInnerHTML={{ __html: value }} 
       />
