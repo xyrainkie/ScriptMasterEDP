@@ -1,6 +1,6 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import TextareaWithToolbar from './TextareaWithToolbar';
+import RichTextEditor from './RichTextEditor';
 import { Asset, AssetType } from '../types';
 
 interface AssetListProps {
@@ -342,10 +342,11 @@ const AssetList: React.FC<AssetListProps> = ({ assets, onRemove, onUpdate, viewM
                         )}
                         <div className="mt-3">
                           <div className={lockedDescIds.has(asset.id) ? 'pointer-events-none opacity-75' : ''}>
-                            <TextareaWithToolbar
+                            <RichTextEditor
                               value={getAssetNote(asset)}
-                              onChange={(v) => setAssetNote(asset.id, asset, v)}
+                              onChange={(html) => setAssetNote(asset.id, asset, html)}
                               placeholder="请输入说明...（独立输入，不影响其它字段）"
+                              height="min-h-[100px]"
                             />
                           </div>
                         </div>
@@ -402,10 +403,11 @@ const AssetList: React.FC<AssetListProps> = ({ assets, onRemove, onUpdate, viewM
                                         ))}
                                       </div>
                                     )}
-                                    <TextareaWithToolbar
+                                    <RichTextEditor
                                       value={getExtraNote(ex)}
-                                      onChange={(v) => setExtraNote(asset, idx, v)}
+                                      onChange={(html) => setExtraNote(asset, idx, html)}
                                       placeholder="对此分项的说明..."
+                                      height="min-h-[100px]"
                                     />
                                   </div>
                                   <button

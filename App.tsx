@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CourseProject, Template, Segment, Asset, AssetType, CoursePreset } from './types';
 import AssetList from './components/AssetList';
-import TextareaWithToolbar from './components/TextareaWithToolbar';
+import RichTextEditor from './components/RichTextEditor';
 
 // --- System Default Templates ---
 const DEFAULT_TEMPLATES: Template[] = [
@@ -333,43 +333,13 @@ const App: React.FC = () => {
 
   // --- Export Excel ---
   const handleExport = () => {
-    const renderText = (input: string): string => {
+    const renderNoteHtml = (input: string): string => {
       const s = String(input || '');
-      const lines = s.split(/\r?\n/);
-      const out: string[] = [];
-      let i = 0;
-      while (i < lines.length) {
-        if (/^\s*---\s*$/.test(lines[i])) { out.push('<hr/>'); i++; continue; }
-        if (/^\s*>\s*/.test(lines[i])) {
-          const q: string[] = [];
-          while (i < lines.length && /^\s*>\s*/.test(lines[i])) { q.push(lines[i].replace(/^\s*>\s*/, '')); i++; }
-          out.push(`<blockquote>${q.join('<br/>')}</blockquote>`);
-          continue;
-        }
-        if (/^\s*-\s+/.test(lines[i])) {
-          const ul: string[] = [];
-          while (i < lines.length && /^\s*-\s+/.test(lines[i])) { ul.push(lines[i].replace(/^\s*-\s+/, '')); i++; }
-          const items = ul.map(t => `<li>${t}</li>`).join('');
-          out.push(`<ul>${items}</ul>`);
-          continue;
-        }
-        if (/^\s*\d+\.\s+/.test(lines[i])) {
-          const ol: string[] = [];
-          while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i])) { ol.push(lines[i].replace(/^\s*\d+\.\s+/, '')); i++; }
-          const items = ol.map(t => `<li>${t}</li>`).join('');
-          out.push(`<ol>${items}</ol>`);
-          continue;
-        }
-        let t = lines[i];
-        t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-             .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-             .replace(/~~([^~]+)~~/g, '<del>$1</del>')
-             .replace(/`([^`]+)`/g, '<code>$1</code>')
-             .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-        out.push(t);
-        i++;
+      // If contains basic HTML tags, assume already formatted; strip script tags for safety
+      if (/[<>]/.test(s)) {
+        return s.replace(/<script[\s\S]*?<\/script>/gi, '');
       }
-      return out.join('<br/>');
+      return s.replace(/\r?\n/g, '<br/>');
     };
 
     let htmlContent = `
@@ -434,7 +404,7 @@ const App: React.FC = () => {
             <tbody>
               ${segment.note ? `<tr>
                 <td style="background:#f9fafb; font-size:12px; font-weight:700; text-align:center; width:40px;">TG</td>
-                <td colspan="7" style="background:#f9fafb; font-size:12px; white-space:normal; line-height:1.4;">${renderText(segment.note || '')}</td>
+                <td colspan="7" style="background:#f9fafb; font-size:12px; white-space:normal; line-height:1.4;">${renderNoteHtml(segment.note || '')}</td>
               </tr>` : ''}
         `;
 
@@ -451,7 +421,7 @@ const App: React.FC = () => {
           const assetNote = (() => {
             const cf = (asset as any).customFields || {};
             const note = cf.note || '';
-            return String(note || '').length ? renderText(note) : '';
+            return String(note || '').length ? renderNoteHtml(note) : '';
           })();
           const typeMulti = (() => {
             const sel = (asset as any).customFields?.selected_types || '';
@@ -478,7 +448,7 @@ const App: React.FC = () => {
             extras.forEach((ex) => {
               const type = (() => { const sel = ex.customFields?.selected_types || ''; const arr = sel.split('|').filter(Boolean); return arr.length ? arr.join(', ') : (ex.type || asset.type || '-'); })();
               const fmts = (Array.isArray(ex.formats) && ex.formats.length) ? ex.formats.join(', ') : '未选择';
-              const note = (ex.customFields && ex.customFields.note) ? renderText(ex.customFields.note) : '';
+              const note = (ex.customFields && ex.customFields.note) ? renderNoteHtml(ex.customFields.note) : '';
               const cfString = (() => {
                 const cf = ex.customFields || {};
                 const entries = Object.entries(cf).filter(([k, v]) => String(v || '').length > 0 && k !== 'note' && k !== 'selected_types');
@@ -1243,12 +1213,12 @@ const App: React.FC = () => {
                                      </div>
                                      <div className="mt-4">
                                       <label className="text-[10px] uppercase font-bold text-slate-400">TG</label>
-                                       <TextareaWithToolbar
-                                         value={segment.note || ''}
-                                         onChange={(v) => updateSegment(segment.id, { note: v })}
-                                         placeholder="在此输入对此环节的整体说明（可调节大小）"
-                                         rows={4}
-                                       />
+                                      <RichTextEditor
+                                        value={segment.note || ''}
+                                        onChange={(html) => updateSegment(segment.id, { note: html })}
+                                        placeholder="在此输入对此环节的整体说明（可调节大小）"
+                                        height="min-h-[120px]"
+                                      />
                                      </div>
                                 </>
                             )}
