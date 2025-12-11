@@ -112,11 +112,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 p-1 border-b border-slate-200 bg-white">
         
-        {/* Presets */}
+        {/* Presets (remove 批注) */}
         <div className="flex items-center gap-0.5 mr-2 pr-2 border-r border-slate-200">
             <button onClick={() => applyPreset('title')} className="px-1.5 py-0.5 text-[10px] font-bold bg-slate-100 hover:bg-slate-200 rounded">标题</button>
             <button onClick={() => applyPreset('highlight')} className="px-1.5 py-0.5 text-[10px] bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded">高亮</button>
-            <button onClick={() => applyPreset('note')} className="px-1.5 py-0.5 text-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded border border-indigo-100">批注</button>
         </div>
 
         {/* Basic */}
@@ -128,10 +127,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             <ToolbarButton icon="fa-remove-format" cmd="removeFormat" title="清除格式" />
         </div>
         
-        {/* Lists */}
+        {/* Lists (remove 列表/编号) */}
         <div className="flex items-center gap-0.5 mr-2 pr-2 border-r border-slate-200">
-            <ToolbarButton icon="fa-list-ul" cmd="insertUnorderedList" title="列表" />
-            <ToolbarButton icon="fa-list-ol" cmd="insertOrderedList" title="编号" />
             <ToolbarButton icon="fa-indent" cmd="indent" title="增加缩进" />
             <ToolbarButton icon="fa-outdent" cmd="outdent" title="减少缩进" />
         </div>
@@ -162,7 +159,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             <ToolbarButton icon="fa-align-right" cmd="justifyRight" title="右对齐" />
         </div>
 
-        {/* Font Size / Heading */}
+        {/* Font Size */}
         <div className="flex items-center gap-1 mr-2 pr-2 border-r border-slate-200">
             <select onChange={(e) => setFontSize(e.target.value)} className="text-xs bg-white border border-slate-300 rounded px-2 py-1">
               <option value="">字号</option>
@@ -170,12 +167,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               <option value="3">标准</option>
               <option value="4">中</option>
               <option value="5">大</option>
-            </select>
-            <select onChange={(e) => execCommand('formatBlock', e.target.value)} className="text-xs bg-white border border-slate-300 rounded px-2 py-1">
-              <option value="">结构</option>
-              <option value="P">正文</option>
-              <option value="H3">副标题</option>
-              <option value="H4">小标题</option>
             </select>
         </div>
 
