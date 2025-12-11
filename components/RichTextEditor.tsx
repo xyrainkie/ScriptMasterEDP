@@ -38,7 +38,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     if (editorRef.current && editorRef.current.innerHTML !== value) {
        if (value === '' || editorRef.current.innerHTML === '<br>') {
          editorRef.current.innerHTML = value;
-         placeCaretAtEnd();
        }
     }
   }, [value]);
@@ -53,7 +52,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     document.execCommand(command, false, value);
     if (editorRef.current) {
       editorRef.current.focus();
-      placeCaretAtEnd();
       handleInput();
     }
   };
