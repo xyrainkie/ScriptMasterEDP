@@ -19,11 +19,22 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   height = "min-h-[200px]"
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
+  const placeCaretAtEnd = () => {
+    const el = editorRef.current;
+    if (!el) return;
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+  };
 
   useEffect(() => {
     if (editorRef.current && editorRef.current.innerHTML !== value) {
        if (value === '' || editorRef.current.innerHTML === '<br>') {
          editorRef.current.innerHTML = value;
+         placeCaretAtEnd();
        }
     }
   }, [value]);
@@ -185,6 +196,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         className={`flex-grow p-4 outline-none prose prose-sm prose-slate max-w-none text-slate-700 leading-normal overflow-y-auto ${height}`}
         contentEditable
         onInput={handleInput}
+        onFocus={placeCaretAtEnd}
         placeholder={placeholder}
         dangerouslySetInnerHTML={{ __html: value }} 
       />
