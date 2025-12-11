@@ -42,6 +42,16 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     }
   };
 
+  const createLink = () => {
+    const url = window.prompt('输入链接地址', 'https://');
+    if (!url) return;
+    execCommand('createLink', url);
+  };
+
+  const setFontSize = (size: string) => {
+    execCommand('fontSize', size);
+  };
+
   const insertTable = () => {
     const tableHTML = `
       <table style="width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 10px;">
@@ -114,12 +124,16 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             <ToolbarButton icon="fa-bold" cmd="bold" title="加粗" />
             <ToolbarButton icon="fa-italic" cmd="italic" title="斜体" />
             <ToolbarButton icon="fa-underline" cmd="underline" title="下划线" />
+            <ToolbarButton icon="fa-strikethrough" cmd="strikeThrough" title="删除线" />
+            <ToolbarButton icon="fa-remove-format" cmd="removeFormat" title="清除格式" />
         </div>
         
         {/* Lists */}
         <div className="flex items-center gap-0.5 mr-2 pr-2 border-r border-slate-200">
             <ToolbarButton icon="fa-list-ul" cmd="insertUnorderedList" title="列表" />
             <ToolbarButton icon="fa-list-ol" cmd="insertOrderedList" title="编号" />
+            <ToolbarButton icon="fa-indent" cmd="indent" title="增加缩进" />
+            <ToolbarButton icon="fa-outdent" cmd="outdent" title="减少缩进" />
         </div>
 
         {/* Inserts */}
@@ -127,9 +141,50 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             <button type="button" onClick={insertTable} className="p-1 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded" title="插入表格">
                 <i className="fas fa-table text-xs"></i>
             </button>
+            <button type="button" onClick={() => execCommand('insertHorizontalRule')} className="p-1 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded" title="分隔线">
+                <i className="fas fa-minus text-xs"></i>
+            </button>
+            <button type="button" onClick={createLink} className="p-1 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 rounded" title="链接">
+                <i className="fas fa-link text-xs"></i>
+            </button>
             <div className="flex items-center ml-2" title="文字颜色">
                 <input type="color" className="w-3.5 h-3.5 p-0 border-0 rounded cursor-pointer" onChange={(e) => execCommand('foreColor', e.target.value)} />
             </div>
+            <div className="flex items-center ml-2" title="背景颜色">
+                <input type="color" className="w-3.5 h-3.5 p-0 border-0 rounded cursor-pointer" onChange={(e) => execCommand('backColor', e.target.value)} />
+            </div>
+        </div>
+
+        {/* Alignment */}
+        <div className="flex items-center gap-0.5 mr-2 pr-2 border-r border-slate-200">
+            <ToolbarButton icon="fa-align-left" cmd="justifyLeft" title="左对齐" />
+            <ToolbarButton icon="fa-align-center" cmd="justifyCenter" title="居中" />
+            <ToolbarButton icon="fa-align-right" cmd="justifyRight" title="右对齐" />
+        </div>
+
+        {/* Font Size / Heading */}
+        <div className="flex items-center gap-1 mr-2 pr-2 border-r border-slate-200">
+            <select onChange={(e) => setFontSize(e.target.value)} className="text-xs bg-white border border-slate-300 rounded px-2 py-1">
+              <option value="">字号</option>
+              <option value="2">小</option>
+              <option value="3">标准</option>
+              <option value="4">中</option>
+              <option value="5">大</option>
+            </select>
+            <select onChange={(e) => execCommand('formatBlock', e.target.value)} className="text-xs bg-white border border-slate-300 rounded px-2 py-1">
+              <option value="">结构</option>
+              <option value="P">正文</option>
+              <option value="H3">副标题</option>
+              <option value="H4">小标题</option>
+            </select>
+        </div>
+
+        {/* Undo/Redo */}
+        <div className="flex items-center gap-0.5">
+            <ToolbarButton icon="fa-undo" cmd="undo" title="撤销" />
+            <ToolbarButton icon="fa-redo" cmd="redo" title="重做" />
+            <ToolbarButton icon="fa-superscript" cmd="superscript" title="上标" />
+            <ToolbarButton icon="fa-subscript" cmd="subscript" title="下标" />
         </div>
       </div>
 
