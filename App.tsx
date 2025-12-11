@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CourseProject, Template, Segment, Asset, AssetType, CoursePreset } from './types';
 import AssetList from './components/AssetList';
-import RichTextEditor from './components/RichTextEditor';
 
 // --- System Default Templates ---
 const DEFAULT_TEMPLATES: Template[] = [
@@ -1204,12 +1203,13 @@ const App: React.FC = () => {
                                      </div>
                                      <div className="mt-4">
                                       <label className="text-[10px] uppercase font-bold text-slate-400">TG</label>
-                                      <RichTextEditor
-                                        value={segment.note || ''}
-                                        onChange={(html) => updateSegment(segment.id, { note: html })}
-                                        placeholder="在此输入对此环节的整体说明（可调节大小）"
-                                        height="min-h-[120px]"
-                                      />
+                                       <textarea
+                                         value={segment.note || ''}
+                                         onChange={(e) => updateSegment(segment.id, { note: e.target.value })}
+                                         className="w-full bg-white border border-slate-300 rounded px-3 py-2 text-sm outline-none min-h-[120px] resize-y"
+                                         rows={4}
+                                         placeholder="在此输入对此环节的整体说明（可调节大小）"
+                                       />
                                      </div>
                                 </>
                             )}

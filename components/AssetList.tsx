@@ -1,6 +1,5 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import RichTextEditor from './RichTextEditor';
 import { Asset, AssetType } from '../types';
 
 interface AssetListProps {
@@ -341,15 +340,14 @@ const AssetList: React.FC<AssetListProps> = ({ assets, onRemove, onUpdate, viewM
                           </div>
                         )}
                         <div className="mt-3">
-                          <div className={lockedDescIds.has(asset.id) ? 'pointer-events-none opacity-75' : ''}>
-                            <RichTextEditor
-                              value={getAssetNote(asset)}
-                              onChange={(html) => setAssetNote(asset.id, asset, html)}
-                              placeholder="请输入说明...（独立输入，不影响其它字段）"
-                              className=""
-                              height="min-h-[120px]"
-                            />
-                          </div>
+                          <textarea
+                            value={getAssetNote(asset)}
+                            onChange={(e) => setAssetNote(asset.id, asset, e.target.value)}
+                            placeholder="请输入说明...（独立输入，不影响其它字段）"
+                            className={`w-full border border-slate-300 rounded px-2 py-2 text-sm outline-none min-h-[80px] resize-y ${lockedDescIds.has(asset.id) ? 'bg-slate-50 text-slate-500 cursor-not-allowed' : 'bg-white'}`}
+                            rows={3}
+                            readOnly={lockedDescIds.has(asset.id)}
+                          />
                         </div>
                         
                         {/* Extras: Additional content items */}
@@ -404,11 +402,12 @@ const AssetList: React.FC<AssetListProps> = ({ assets, onRemove, onUpdate, viewM
                                         ))}
                                       </div>
                                     )}
-                                    <RichTextEditor
+                                    <textarea
                                       value={getExtraNote(ex)}
-                                      onChange={(html) => setExtraNote(asset, idx, html)}
+                                      onChange={(e) => setExtraNote(asset, idx, e.target.value)}
+                                      className="w-full bg-white border border-slate-300 rounded px-2 py-2 text-sm outline-none min-h-[80px] resize-y"
+                                      rows={3}
                                       placeholder="对此分项的说明..."
-                                      height="min-h-[100px]"
                                     />
                                   </div>
                                   <button
