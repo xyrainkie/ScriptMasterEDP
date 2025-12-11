@@ -201,7 +201,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         onInput={handleInput}
         onFocus={handleFocus}
         placeholder={placeholder}
-        dangerouslySetInnerHTML={{ __html: value }} 
       />
     </div>
   );
