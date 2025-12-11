@@ -1,5 +1,6 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import TextareaWithToolbar from './TextareaWithToolbar';
 import { Asset, AssetType } from '../types';
 
 interface AssetListProps {
@@ -340,14 +341,13 @@ const AssetList: React.FC<AssetListProps> = ({ assets, onRemove, onUpdate, viewM
                           </div>
                         )}
                         <div className="mt-3">
-                          <textarea
-                            value={getAssetNote(asset)}
-                            onChange={(e) => setAssetNote(asset.id, asset, e.target.value)}
-                            placeholder="请输入说明...（独立输入，不影响其它字段）"
-                            className={`w-full border border-slate-300 rounded px-2 py-2 text-sm outline-none min-h-[80px] resize-y ${lockedDescIds.has(asset.id) ? 'bg-slate-50 text-slate-500 cursor-not-allowed' : 'bg-white'}`}
-                            rows={3}
-                            readOnly={lockedDescIds.has(asset.id)}
-                          />
+                          <div className={lockedDescIds.has(asset.id) ? 'pointer-events-none opacity-75' : ''}>
+                            <TextareaWithToolbar
+                              value={getAssetNote(asset)}
+                              onChange={(v) => setAssetNote(asset.id, asset, v)}
+                              placeholder="请输入说明...（独立输入，不影响其它字段）"
+                            />
+                          </div>
                         </div>
                         
                         {/* Extras: Additional content items */}
@@ -402,11 +402,9 @@ const AssetList: React.FC<AssetListProps> = ({ assets, onRemove, onUpdate, viewM
                                         ))}
                                       </div>
                                     )}
-                                    <textarea
+                                    <TextareaWithToolbar
                                       value={getExtraNote(ex)}
-                                      onChange={(e) => setExtraNote(asset, idx, e.target.value)}
-                                      className="w-full bg-white border border-slate-300 rounded px-2 py-2 text-sm outline-none min-h-[80px] resize-y"
-                                      rows={3}
+                                      onChange={(v) => setExtraNote(asset, idx, v)}
                                       placeholder="对此分项的说明..."
                                     />
                                   </div>
