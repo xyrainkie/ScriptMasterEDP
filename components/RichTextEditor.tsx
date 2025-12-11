@@ -19,7 +19,6 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   height = "min-h-[200px]"
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
-  const focusedOnceRef = useRef<boolean>(false);
   const placeCaretAtEnd = () => {
     const el = editorRef.current;
     if (!el) return;
@@ -32,13 +31,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   };
 
   const handleFocus = () => {
-    const el = editorRef.current;
-    if (!el) return;
-    const plain = (el.innerText || '').replace(/\u200B/g, '').trim();
-    if (plain.length === 0 && !focusedOnceRef.current) {
-      placeCaretAtEnd();
-      focusedOnceRef.current = true;
-    }
+    placeCaretAtEnd();
   };
 
   useEffect(() => {
@@ -60,6 +53,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     document.execCommand(command, false, value);
     if (editorRef.current) {
       editorRef.current.focus();
+      placeCaretAtEnd();
       handleInput();
     }
   };
