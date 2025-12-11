@@ -333,6 +333,45 @@ const App: React.FC = () => {
 
   // --- Export Excel ---
   const handleExport = () => {
+    const renderText = (input: string): string => {
+      const s = String(input || '');
+      const lines = s.split(/\r?\n/);
+      const out: string[] = [];
+      let i = 0;
+      while (i < lines.length) {
+        if (/^\s*---\s*$/.test(lines[i])) { out.push('<hr/>'); i++; continue; }
+        if (/^\s*>\s*/.test(lines[i])) {
+          const q: string[] = [];
+          while (i < lines.length && /^\s*>\s*/.test(lines[i])) { q.push(lines[i].replace(/^\s*>\s*/, '')); i++; }
+          out.push(`<blockquote>${q.join('<br/>')}</blockquote>`);
+          continue;
+        }
+        if (/^\s*-\s+/.test(lines[i])) {
+          const ul: string[] = [];
+          while (i < lines.length && /^\s*-\s+/.test(lines[i])) { ul.push(lines[i].replace(/^\s*-\s+/, '')); i++; }
+          const items = ul.map(t => `<li>${t}</li>`).join('');
+          out.push(`<ul>${items}</ul>`);
+          continue;
+        }
+        if (/^\s*\d+\.\s+/.test(lines[i])) {
+          const ol: string[] = [];
+          while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i])) { ol.push(lines[i].replace(/^\s*\d+\.\s+/, '')); i++; }
+          const items = ol.map(t => `<li>${t}</li>`).join('');
+          out.push(`<ol>${items}</ol>`);
+          continue;
+        }
+        let t = lines[i];
+        t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+             .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+             .replace(/~~([^~]+)~~/g, '<del>$1</del>')
+             .replace(/`([^`]+)`/g, '<code>$1</code>')
+             .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+        out.push(t);
+        i++;
+      }
+      return out.join('<br/>');
+    };
+
     let htmlContent = `
       <html>
       <head>
@@ -395,7 +434,7 @@ const App: React.FC = () => {
             <tbody>
               ${segment.note ? `<tr>
                 <td style="background:#f9fafb; font-size:12px; font-weight:700; text-align:center; width:40px;">TG</td>
-                <td colspan="7" style="background:#f9fafb; font-size:12px; white-space:normal; line-height:1.4;">${String(segment.note || '').replace(/\r?\n/g, '<br/>')}</td>
+                <td colspan="7" style="background:#f9fafb; font-size:12px; white-space:normal; line-height:1.4;">${renderText(segment.note || '')}</td>
               </tr>` : ''}
         `;
 
@@ -412,7 +451,7 @@ const App: React.FC = () => {
           const assetNote = (() => {
             const cf = (asset as any).customFields || {};
             const note = cf.note || '';
-            return String(note || '').length ? note : '';
+            return String(note || '').length ? renderText(note) : '';
           })();
           const typeMulti = (() => {
             const sel = (asset as any).customFields?.selected_types || '';
@@ -420,7 +459,7 @@ const App: React.FC = () => {
             return arr.length ? arr.join(', ') : String(asset.type || '');
           })();
           const assetDescLines: string[] = [];
-          if (assetNote) assetDescLines.push(String(assetNote).replace(/\r?\n/g, '<br/>'));
+          if (assetNote) assetDescLines.push(assetNote);
           if (assetCF) assetDescLines.push(String(assetCF).replace(/\r?\n/g, '<br/>'));
             const assetDescHtml = assetDescLines.length ? assetDescLines.join('<br/>') : '-';
             htmlContent += `
@@ -439,14 +478,14 @@ const App: React.FC = () => {
             extras.forEach((ex) => {
               const type = (() => { const sel = ex.customFields?.selected_types || ''; const arr = sel.split('|').filter(Boolean); return arr.length ? arr.join(', ') : (ex.type || asset.type || '-'); })();
               const fmts = (Array.isArray(ex.formats) && ex.formats.length) ? ex.formats.join(', ') : '未选择';
-              const note = (ex.customFields && ex.customFields.note) ? ex.customFields.note : '';
+              const note = (ex.customFields && ex.customFields.note) ? renderText(ex.customFields.note) : '';
               const cfString = (() => {
                 const cf = ex.customFields || {};
                 const entries = Object.entries(cf).filter(([k, v]) => String(v || '').length > 0 && k !== 'note' && k !== 'selected_types');
                 return entries.length ? entries.map(([k, v]) => `${k}：${String(v).replace(/\r?\n/g, '<br/>')}`).join('；') : '';
               })();
               const exDescLines: string[] = [];
-              if (note) exDescLines.push(String(note).replace(/\r?\n/g, '<br/>'));
+              if (note) exDescLines.push(note);
               if (cfString) exDescLines.push(cfString);
               const exDescHtml = exDescLines.length ? exDescLines.join('<br/>') : '-';
                 htmlContent += `
