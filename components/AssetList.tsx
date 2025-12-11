@@ -404,12 +404,11 @@ const AssetList: React.FC<AssetListProps> = ({ assets, onRemove, onUpdate, viewM
                                         ))}
                                       </div>
                                     )}
-                                    <textarea
+                                    <RichTextEditor
                                       value={getExtraNote(ex)}
-                                      onChange={(e) => setExtraNote(asset, idx, e.target.value)}
-                                      className="w-full bg-white border border-slate-300 rounded px-2 py-2 text-sm outline-none min-h-[80px] resize-y"
-                                      rows={3}
+                                      onChange={(html) => setExtraNote(asset, idx, html)}
                                       placeholder="对此分项的说明..."
+                                      height="min-h-[100px]"
                                     />
                                   </div>
                                   <button
