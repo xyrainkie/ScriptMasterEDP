@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CourseProject, Template, Segment, Asset, AssetType, CoursePreset } from './types';
 import AssetList from './components/AssetList';
+import RichTextEditor from './components/RichTextEditor';
 
 // --- System Default Templates ---
 const DEFAULT_TEMPLATES: Template[] = [
@@ -332,6 +333,15 @@ const App: React.FC = () => {
 
   // --- Export Excel ---
   const handleExport = () => {
+    const renderNoteHtml = (input: string): string => {
+      const s = String(input || '');
+      // If contains basic HTML tags, assume already formatted; strip script tags for safety
+      if (/[<>]/.test(s)) {
+        return s.replace(/<script[\s\S]*?<\/script>/gi, '');
+      }
+      return s.replace(/\r?\n/g, '<br/>');
+    };
+
     let htmlContent = `
       <html>
       <head>
@@ -394,7 +404,7 @@ const App: React.FC = () => {
             <tbody>
               ${segment.note ? `<tr>
                 <td style="background:#f9fafb; font-size:12px; font-weight:700; text-align:center; width:40px;">TG</td>
-                <td colspan="7" style="background:#f9fafb; font-size:12px; white-space:normal; line-height:1.4;">${String(segment.note || '').replace(/\r?\n/g, '<br/>')}</td>
+                <td colspan="7" style="background:#f9fafb; font-size:12px; white-space:normal; line-height:1.4;">${renderNoteHtml(segment.note || '')}</td>
               </tr>` : ''}
         `;
 
@@ -411,7 +421,7 @@ const App: React.FC = () => {
           const assetNote = (() => {
             const cf = (asset as any).customFields || {};
             const note = cf.note || '';
-            return String(note || '').length ? note : '';
+            return String(note || '').length ? renderNoteHtml(note) : '';
           })();
           const typeMulti = (() => {
             const sel = (asset as any).customFields?.selected_types || '';
@@ -419,7 +429,7 @@ const App: React.FC = () => {
             return arr.length ? arr.join(', ') : String(asset.type || '');
           })();
           const assetDescLines: string[] = [];
-          if (assetNote) assetDescLines.push(String(assetNote).replace(/\r?\n/g, '<br/>'));
+          if (assetNote) assetDescLines.push(assetNote);
           if (assetCF) assetDescLines.push(String(assetCF).replace(/\r?\n/g, '<br/>'));
             const assetDescHtml = assetDescLines.length ? assetDescLines.join('<br/>') : '-';
             htmlContent += `
@@ -438,14 +448,14 @@ const App: React.FC = () => {
             extras.forEach((ex) => {
               const type = (() => { const sel = ex.customFields?.selected_types || ''; const arr = sel.split('|').filter(Boolean); return arr.length ? arr.join(', ') : (ex.type || asset.type || '-'); })();
               const fmts = (Array.isArray(ex.formats) && ex.formats.length) ? ex.formats.join(', ') : '未选择';
-              const note = (ex.customFields && ex.customFields.note) ? ex.customFields.note : '';
+              const note = (ex.customFields && ex.customFields.note) ? renderNoteHtml(ex.customFields.note) : '';
               const cfString = (() => {
                 const cf = ex.customFields || {};
                 const entries = Object.entries(cf).filter(([k, v]) => String(v || '').length > 0 && k !== 'note' && k !== 'selected_types');
                 return entries.length ? entries.map(([k, v]) => `${k}：${String(v).replace(/\r?\n/g, '<br/>')}`).join('；') : '';
               })();
               const exDescLines: string[] = [];
-              if (note) exDescLines.push(String(note).replace(/\r?\n/g, '<br/>'));
+              if (note) exDescLines.push(note);
               if (cfString) exDescLines.push(cfString);
               const exDescHtml = exDescLines.length ? exDescLines.join('<br/>') : '-';
                 htmlContent += `
@@ -1203,13 +1213,12 @@ const App: React.FC = () => {
                                      </div>
                                      <div className="mt-4">
                                       <label className="text-[10px] uppercase font-bold text-slate-400">TG</label>
-                                       <textarea
-                                         value={segment.note || ''}
-                                         onChange={(e) => updateSegment(segment.id, { note: e.target.value })}
-                                         className="w-full bg-white border border-slate-300 rounded px-3 py-2 text-sm outline-none min-h-[120px] resize-y"
-                                         rows={4}
-                                         placeholder="在此输入对此环节的整体说明（可调节大小）"
-                                       />
+                                      <RichTextEditor
+                                        value={segment.note || ''}
+                                        onChange={(html) => updateSegment(segment.id, { note: html })}
+                                        placeholder="在此输入对此环节的整体说明（可调节大小）"
+                                        height="min-h-[120px]"
+                                      />
                                      </div>
                                 </>
                             )}
